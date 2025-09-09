@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Siddharth Sharma | Interactive Resume</title>
+    <!-- Chosen Palette: Stone & Sky -->
+    <!-- Application Structure Plan: The application is designed as a single-page narrative portfolio. It starts with a strong hero section to introduce Siddharth and provide a detailed overview. A high-impact dashboard of his key achievements immediately grabs attention. A vertical timeline then tells his career story chronologically. A new section highlights his professional certifications. An interactive skill section with a radar chart visually demonstrates his unique blend of business and tech skills. A tabbed project spotlight allows deep dives into his work without cluttering the page. This structure was chosen to create an engaging, story-driven experience for recruiters, guiding them from a high-level overview and impact to detailed qualifications and proof of work. -->
+    <!-- Visualization & Content Choices: 
+        - Key Metrics (Sales, Followers): Goal: Inform/Impress -> Viz: Animated Number Counters -> Interaction: Animate on scroll -> Justification: More dynamic and impactful than static text. -> Library: Vanilla JS.
+        - Career Path: Goal: Show Change/Growth -> Viz: Vertical Timeline -> Interaction: Hover effects on timeline points -> Justification: Tells a story of progression better than a flat list. -> Library: HTML/CSS.
+        - Skills Overview: Goal: Compare/Organize -> Viz: Radar Chart -> Interaction: Animated rendering, tooltips on hover -> Justification: Perfectly visualizes the balance of his diverse skill set (Business, Design, Tech). -> Library: Chart.js.
+        - Detailed Projects & Certifications: Goal: Organize/Inform -> Viz: Tabbed Content Sections & Bulleted Lists -> Interaction: Click to switch content -> Justification: Presents dense information cleanly and allows user-directed exploration, now including external project links to demonstrate real work. -> Library: Vanilla JS.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f5f5f4; /* stone-100 */
+            color: #292524; /* stone-800 */
+            background-image: radial-gradient(at 50% 0%, #e5e7eb, #f3f4f6 50%, #f5f5f4);
+        }
+        .nav-link {
+            transition: color 0.3s;
+        }
+        .nav-link.active, .nav-link:hover {
+            color: #3b82f6; /* blue-500 */
+        }
+        .tab.active {
+            border-color: #3b82f6; /* blue-500 */
+            color: #3b82f6; /* blue-500 */
+            background-color: #eff6ff; /* blue-50 */
+        }
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -31px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background-color: #f5f5f4; /* stone-100 */
+            border: 4px solid #d6d3d1; /* stone-300 */
+            transition: border-color 0.3s;
+        }
+        .timeline-item:hover::before {
+            border-color: #3b82f6; /* blue-500 */
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 400px;
+            }
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <header class="bg-stone-100/80 backdrop-blur-md sticky top-0 z-50">
+        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <a href="#" class="text-xl font-bold text-stone-800">Siddharth Sharma</a>
+            <div class="hidden md:flex items-center space-x-4 text-sm">
+                <a href="#overview" class="nav-link text-stone-600 font-medium">Overview</a>
+                <a href="#journey" class="nav-link text-stone-600 font-medium">Journey</a>
+                <a href="#certifications" class="nav-link text-stone-600 font-medium">Certifications</a>
+                <a href="#skills" class="nav-link text-stone-600 font-medium">Skills</a>
+                <a href="#projects" class="nav-link text-stone-600 font-medium">Projects</a>
+                <div class="relative">
+                    <button id="portfolio-dropdown-button" class="bg-blue-500 text-white px-3 py-1.5 rounded-md hover:bg-blue-600 transition-colors flex items-center gap-2">
+                        View Portfolio
+                        <span class="text-white">&#x25BC;</span>
+                    </button>
+                    <div id="portfolio-dropdown-menu" class="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-md shadow-lg py-1 z-50 hidden">
+                        <a href="https://www.behance.net/skrrrttt" target="_blank" class="block px-4 py-2 text-stone-700 hover:bg-stone-100">Behance Portfolio</a>
+                        <a href="https://www.instagram.com/sayteesy" target="_blank" class="block px-4 py-2 text-stone-700 hover:bg-stone-100">Sayteesy Instagram</a>
+                        <a href="https://siddharthsharma16.github.io/geoglobe/" target="_blank" class="block px-4 py-2 text-stone-700 hover:bg-stone-100">GeoGlobe Project</a>
+                        <a href="https://siddharthsharma16.github.io/safezone-sos/" target="_blank" class="block px-4 py-2 text-stone-700 hover:bg-stone-100">Safezone-SOS Project</a>
+                    </div>
+                </div>
+            </div>
+             <button id="mobile-menu-button" class="md:hidden text-stone-800">
+                <span class="w-6 h-0.5 bg-current block my-1"></span>
+                <span class="w-6 h-0.5 bg-current block"></span>
+                <span class="w-6 h-0.5 bg-current block my-1"></span>
+            </button>
+        </nav>
+        <div id="mobile-menu" class="hidden md:hidden px-6 pb-4">
+             <a href="#overview" class="block py-2 nav-link text-stone-600 font-medium">Overview</a>
+             <a href="#journey" class="block py-2 nav-link text-stone-600 font-medium">Journey</a>
+             <a href="#certifications" class="block py-2 nav-link text-stone-600 font-medium">Certifications</a>
+             <a href="#skills" class="block py-2 nav-link text-stone-600 font-medium">Skills</a>
+             <a href="#projects" class="block py-2 nav-link text-stone-600 font-medium">Projects</a>
+             <button id="mobile-portfolio-dropdown-button" class="block mt-2 w-full text-center bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition-colors flex items-center justify-center gap-2">
+                View Portfolio <span class="text-white">&#x25BC;</span>
+            </button>
+            <div id="mobile-portfolio-dropdown-menu" class="bg-white border border-gray-200 rounded-md shadow-lg py-1 mt-2 hidden">
+                <a href="https://www.behance.net/skrrrttt" target="_blank" class="block px-4 py-2 text-stone-700 hover:bg-stone-100">Behance Portfolio</a>
+                <a href="https://www.instagram.com/sayteesy" target="_blank" class="block px-4 py-2 text-stone-700 hover:bg-stone-100">Sayteesy Instagram</a>
+                <a href="https://siddharthsharma16.github.io/geoglobe/" target="_blank" class="block px-4 py-2 text-stone-700 hover:bg-stone-100">GeoGlobe Project</a>
+                <a href="https://siddharthsharma16.github.io/safezone-sos/" target="_blank" class="block px-4 py-2 text-stone-700 hover:bg-stone-100">Safezone-SOS Project</a>
+            </div>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-6 py-12 md:py-20">
+        
+        <section id="overview" class="mb-20 md:mb-32">
+            <h1 class="text-4xl md:text-6xl font-bold text-stone-900 mb-4 text-left">Overview</h1>
+            <p class="text-base text-stone-600 max-w-3xl mb-8">
+                A recent <strong>B.Com graduate</strong> with a unique blend of entrepreneurial and technical skills. He has hands-on experience in business development and marketing from successfully founding and managing the streetwear brand, <strong>Sayteesy</strong>, which achieved over ₹200,000 in sales and built a strong online community of 2,000+ followers with zero initial investment. A self-driven learner, Siddharth has also cultivated skills in <strong>UI design</strong> and <strong>prompt engineering</strong>, demonstrated by his professional Behance portfolio and proficiency with large language models (LLMs) like Gemini and GPT. He is a creative problem-solver with a proven ability to turn ideas into tangible results and is now seeking a role to apply his diverse skill set.
+            </p>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-8 max-w-2xl mx-auto text-left">
+                <div class="bg-white p-6 rounded-lg shadow-sm">
+                    <div class="text-sm text-stone-500 mb-2">Total Sales Achieved</div>
+                    <div id="sales-counter" class="text-4xl font-bold text-blue-500">₹0</div>
+                    <p class="text-sm text-stone-500 mt-1">from zero initial investment.</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-sm">
+                    <div class="text-sm text-stone-500 mb-2">Community Growth</div>
+                    <div id="followers-counter" class="text-4xl font-bold text-blue-500">0+</div>
+                     <p class="text-sm text-stone-500 mt-1">organic social media followers.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="journey" class="mb-20 md:mb-32">
+            <h2 class="text-3xl md:text-4xl font-bold text-center mb-4">My Journey</h2>
+            <p class="text-center text-stone-600 max-w-2xl mx-auto mb-16">
+                This timeline highlights my path from academic foundations in commerce to hands-on entrepreneurial ventures and my continuous journey into technology and design.
+            </p>
+            <div class="relative max-w-2xl mx-auto pl-8 border-l-2 border-stone-200">
+                <div class="timeline-item mb-12">
+                    <h3 class="text-xl font-semibold text-stone-800">Founded Sayteesy Streetwear</h3>
+                    <p class="text-stone-500 text-sm mb-2">2023</p>
+                    <p class="text-stone-600">Launched a streetwear brand with zero capital. I led marketing and business operations, handling everything from product design to customer engagement.</p>
+                </div>
+                <div class="timeline-item mb-12">
+                    <h3 class="text-xl font-semibold text-stone-800">Mastered UI/UX Design</h3>
+                    <p class="text-stone-500 text-sm mb-2">2024</p>
+                    <p class="text-stone-600">Driven by a passion for design, I completed a comprehensive UI/UX course on Udemy and began creating a professional portfolio on Behance.</p>
+                </div>
+                <div class="timeline-item mb-12">
+                    <h3 class="text-xl font-semibold text-stone-800">Graduated with B.Com Degree</h3>
+                    <p class="text-stone-500 text-sm mb-2">2025</p>
+                    <p class="text-stone-600">Completed my Bachelor of Commerce with a 7.0 CGPA, building a strong foundation in business principles, finance, and marketing.</p>
+                </div>
+                <div class="timeline-item">
+                    <h3 class="text-xl font-semibold text-stone-800">Explored Prompt Engineering & AI</h3>
+                    <p class="text-stone-500 text-sm mb-2">2025</p>
+                    <p class="text-stone-600">Completed Microsoft's Prompt Engineering course and started building websites using LLMs like Gemini and GPT, diving into the future of AI-powered development.</p>
+                </div>
+            </div>
+        </section>
+        
+        <section id="certifications" class="mb-20 md:mb-32">
+            <h2 class="text-3xl md:text-4xl font-bold text-center mb-4">Certifications</h2>
+            <p class="text-center text-stone-600 max-w-2xl mx-auto mb-12">
+                I am committed to continuous learning and have earned the following certifications to formalize my skills in key areas.
+            </p>
+            <div class="max-w-xl mx-auto bg-white p-6 md:p-8 rounded-lg shadow-sm">
+                <ul class="space-y-4">
+                    <li class="flex items-start"><span class="text-blue-500 font-bold mr-3 mt-1">&#10003;</span><span><strong class="text-stone-800">Complete UI/UX Design from Figma:</strong> Udemy Certificate</span></li>
+                    <li class="flex items-start"><span class="text-blue-500 font-bold mr-3 mt-1">&#10003;</span><span><strong class="text-stone-800">End-to-End Digital Marketing:</strong> Udemy Certificate</span></li>
+                    <li class="flex items-start"><span class="text-blue-500 font-bold mr-3 mt-1">&#10003;</span><span><strong class="text-stone-800">Prompt Engineering:</strong> Microsoft Certificate</span></li>
+                </ul>
+            </div>
+        </section>
+
+        <section id="skills" class="mb-20 md:mb-32">
+            <h2 class="text-3xl md:text-4xl font-bold text-center mb-4">Core Competencies</h2>
+            <p class="text-center text-stone-600 max-w-2xl mx-auto mb-12">
+                My skills are a unique fusion of business strategy, creative design, and emerging technology. This chart visualizes how my abilities intersect to create value. Interact with the chart to see details.
+            </p>
+            <div class="chart-container">
+                <canvas id="skillsChart"></canvas>
+            </div>
+        </section>
+
+        <section id="projects">
+            <h2 class="text-3xl md:text-4xl font-bold text-center mb-4">Project Spotlight</h2>
+             <p class="text-center text-stone-600 max-w-2xl mx-auto mb-12">
+                Here’s a deeper look into my key projects. Each tab showcases a different facet of my experience, from brand-building and e-commerce to user-centric design and AI application.
+            </p>
+            <div class="max-w-4xl mx-auto">
+                <div class="flex border-b border-stone-200 mb-8 space-x-2 md:space-x-4">
+                    <button class="tab active flex-1 text-center font-bold p-3 md:p-4 rounded-t-lg transition-colors bg-white hover:bg-stone-50 border border-transparent border-b-0 -mb-px">Entrepreneurship</button>
+                    <button class="tab flex-1 text-center font-bold p-3 md:p-4 rounded-t-lg transition-colors bg-white hover:bg-stone-50 border border-transparent border-b-0 -mb-px" data-tab="uiux">UI/UX Design</button>
+                    <button class="tab flex-1 text-center font-bold p-3 md:p-4 rounded-t-lg transition-colors bg-white hover:bg-stone-50 border border-transparent border-b-0 -mb-px" data-tab="ai">Prompt Engineering</button>
+                </div>
+                <div id="tab-content" class="bg-white p-6 md:p-8 rounded-lg shadow-sm">
+                    <div id="sayteesy" class="tab-pane">
+                        <h3 class="text-2xl font-bold mb-4">Sayteesy Streetwear Brand</h3>
+                        <p class="text-stone-600 mb-6">As founder, I translated an idea into a profitable reality. This project was a comprehensive lesson in bootstrapping, marketing, and team leadership. We built a brand that resonated with a young audience and achieved significant milestones without any external funding.</p>
+                        <ul class="space-y-4">
+                            <li class="flex items-start"><span class="text-blue-500 font-bold mr-3 mt-1">&#10003;</span><span><strong class="text-stone-800">Bootstrapped Growth:</strong> Managed all business operations, from sourcing to sales, achieving over ₹200,000 in revenue.</span></li>
+                            <li class="flex items-start"><span class="text-blue-500 font-bold mr-3 mt-1">&#10003;</span><span><strong class="text-stone-800">Digital Marketing:</strong> Developed and executed an organic social media strategy that grew our community to over 2,000 engaged followers.</span></li>
+                            <li class="flex items-start"><span class="text-blue-500 font-bold mr-3 mt-1">&#10003;</span><span><strong class="text-stone-800">Team Leadership:</strong> Recruited and managed a small, agile team to handle design, production, and logistics.</span></li>
+                        </ul>
+                    </div>
+                    <div id="uiux" class="tab-pane hidden">
+                        <h3 class="text-2xl font-bold mb-4">UI/UX Design Portfolio</h3>
+                        <p class="text-stone-600 mb-6">My passion for creating intuitive and beautiful digital experiences led me to UI/UX design. I focus on user-centric principles to solve problems and create interfaces that are both functional and delightful. My portfolio showcases a range of projects that demonstrate my skills in design thinking, prototyping, and visual design.</p>
+                        <ul class="space-y-4">
+                            <li class="flex items-start"><span class="text-blue-500 font-bold mr-3 mt-1">&#10003;</span><span><strong class="text-stone-800">Comprehensive Training:</strong> Mastered design principles and tools through an in-depth Udemy course.</span></li>
+                            <li class="flex items-start"><span class="text-blue-500 font-bold mr-3 mt-1">&#10003;</span><span><strong class="text-stone-800">Professional Portfolio:</strong> Created and curated a collection of design projects on Behance, showcasing my ability to tackle diverse design challenges.</span></li>
+                            <li class="flex items-start"><span class="text-blue-500 font-bold mr-3 mt-1">&#10003;</span><span><strong class="text-stone-800">Tools of the Trade:</strong> Proficient in industry-standard tools like Figma for wireframing, prototyping, and high-fidelity mockups.</span></li>
+                        </ul>
+                         <a href="https://www.behance.net/skrrrttt" target="_blank" class="inline-block mt-6 bg-blue-500 text-white px-6 py-2 rounded-md hover:bg-blue-600 transition-colors">Explore My Designs on Behance</a>
+                    </div>
+                    <div id="ai" class="tab-pane hidden">
+                        <h3 class="text-2xl font-bold mb-4">AI & Prompt Engineering</h3>
+                        <p class="text-stone-600 mb-6">Fascinated by the potential of AI, I pursued certification in Prompt Engineering from Microsoft. I have practical experience in leveraging Large Language Models (LLMs) to build functional websites and applications, exploring the cutting edge of AI-driven development and content creation.</p>
+                         <ul class="space-y-4">
+                            <li class="flex items-start"><span class="text-blue-500 font-bold mr-3 mt-1">&#10003;</span><span><strong class="text-stone-800">Certified Expertise:</strong> Gained official certification from Microsoft, focusing on advanced techniques for interacting with AI models.</span></li>
+                            <li class="flex items-start"><span class="text-blue-500 font-bold mr-3 mt-1">&#10003;</span><span><strong class="text-stone-800">Client-Side Experience:</strong> Currently working as a vibe coder for <a href="https://clearorbit.site/" target="_blank" class="underline text-blue-500 hover:text-blue-600 transition-colors">clearorbit.site</a>, an AI-driven marketing agency.</span></li>
+                            <li class="flex items-start"><span class="text-blue-500 font-bold mr-3 mt-1">&#10003;</span><span><strong class="text-stone-800">Vibe-Coded Projects:</strong> Built and deployed practical websites including a GK game, <a href="https://siddharthsharma16.github.io/geoglobe/" target="_blank" class="underline text-blue-500 hover:text-blue-600 transition-colors">GeoGlobe</a>, and a real-time location SOS button, <a href="https://siddharthsharma16.github.io/safezone-sos/" target="_blank" class="underline text-blue-500 hover:text-blue-600 transition-colors">Safezone-SOS</a>.</span></li>
+                            <li class="flex items-start"><span class="text-blue-500 font-bold mr-3 mt-1">&#10003;</span><span><strong class="text-stone-800">LLM Proficiency:</strong> Hands-on experience building applications with leading models like GPT, Gemini, and Gork.</span></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-stone-100 border-t border-stone-200 mt-20">
+        <div class="container mx-auto px-6 py-12 text-center">
+             <h2 class="text-2xl md:text-3xl font-bold mb-4">Let's Connect</h2>
+             <p class="text-stone-600 max-w-xl mx-auto mb-8">
+                I'm currently seeking new opportunities where I can apply my unique blend of business and technical skills. If you have a project in mind or think I'd be a good fit for your team, I'd love to hear from you.
+            </p>
+            <a href="https://wa.me/918839814931" class="inline-block bg-blue-500 text-white px-8 py-3 rounded-md hover:bg-blue-600 transition-colors text-lg font-semibold">Get in Touch</a>
+            <p class="text-sm text-stone-500 mt-12">&copy; 2025 Siddharth Sharma. All Rights Reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenuButton.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+            });
+
+            const portfolioDropdownButton = document.getElementById('portfolio-dropdown-button');
+            const portfolioDropdownMenu = document.getElementById('portfolio-dropdown-menu');
+            
+            const mobilePortfolioDropdownButton = document.getElementById('mobile-portfolio-dropdown-button');
+            const mobilePortfolioDropdownMenu = document.getElementById('mobile-portfolio-dropdown-menu');
+
+            function toggleDropdown(button, menu) {
+                const isHidden = menu.classList.contains('hidden');
+                menu.classList.toggle('hidden', !isHidden);
+            }
+
+            portfolioDropdownButton.addEventListener('click', (event) => {
+                event.stopPropagation();
+                toggleDropdown(portfolioDropdownButton, portfolioDropdownMenu);
+            });
+
+            mobilePortfolioDropdownButton.addEventListener('click', (event) => {
+                event.stopPropagation();
+                toggleDropdown(mobilePortfolioDropdownButton, mobilePortfolioDropdownMenu);
+            });
+
+            document.addEventListener('click', (event) => {
+                const isClickInsideDesktopDropdown = portfolioDropdownMenu.contains(event.target) || portfolioDropdownButton.contains(event.target);
+                const isClickInsideMobileDropdown = mobilePortfolioDropdownMenu.contains(event.target) || mobilePortfolioDropdownButton.contains(event.target);
+
+                if (!isClickInsideDesktopDropdown) {
+                    portfolioDropdownMenu.classList.add('hidden');
+                }
+                if (!isClickInsideMobileDropdown) {
+                    mobilePortfolioDropdownMenu.classList.add('hidden');
+                }
+            });
+            
+            const navLinks = document.querySelectorAll('.nav-link');
+            const sections = document.querySelectorAll('section');
+
+            const observerOptions = {
+                root: null,
+                rootMargin: '0px',
+                threshold: 0.5
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        navLinks.forEach(link => {
+                            link.classList.remove('active');
+                            if (link.getAttribute('href').substring(1) === entry.target.id) {
+                                link.classList.add('active');
+                            }
+                        });
+                    }
+                });
+            }, observerOptions);
+
+            sections.forEach(section => {
+                observer.observe(section);
+            });
+
+            function animateCounter(element, target, duration, isCurrency = false) {
+                let start = 0;
+                const stepTime = Math.abs(Math.floor(duration / target));
+                const timer = setInterval(() => {
+                    start += 1;
+                    if (isCurrency) {
+                        element.textContent = '₹' + Math.floor(start * (target/100)).toLocaleString('en-IN');
+                    } else {
+                        element.textContent = Math.floor(start * (target/100)).toLocaleString('en-IN') + '+';
+                    }
+                    if (start === 100) {
+                        clearInterval(timer);
+                         if (isCurrency) {
+                            element.textContent = '₹' + target.toLocaleString('en-IN') + '+';
+                        } else {
+                            element.textContent = target.toLocaleString('en-IN') + '+';
+                        }
+                    }
+                }, stepTime);
+            }
+
+            const counterObserver = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const salesCounter = document.getElementById('sales-counter');
+                        const followersCounter = document.getElementById('followers-counter');
+                        animateCounter(salesCounter, 200000, 2000, true);
+                        animateCounter(followersCounter, 2000, 2000, false);
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.8 });
+
+            counterObserver.observe(document.getElementById('overview'));
+
+            const tabs = document.querySelectorAll('.tab');
+            const tabPanes = document.querySelectorAll('.tab-pane');
+
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    tabs.forEach(item => item.classList.remove('active'));
+                    tab.classList.add('active');
+                    const target = tab.getAttribute('data-tab');
+                    tabPanes.forEach(pane => {
+                        if (pane.id === target) {
+                            pane.classList.remove('hidden');
+                        } else {
+                            pane.classList.add('hidden');
+                        }
+                    });
+                });
+            });
+
+            const ctx = document.getElementById('skillsChart').getContext('2d');
+            const skillsChart = new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: ['Entrepreneurship', 'Digital Marketing', 'UI/UX Design', 'Prompt Engineering', 'Business Development'],
+                    datasets: [{
+                        label: 'Skill Level',
+                        data: [90, 85, 80, 75, 88],
+                        backgroundColor: 'rgba(59, 130, 246, 0.2)',
+                        borderColor: 'rgba(59, 130, 246, 1)',
+                        borderWidth: 2,
+                        pointBackgroundColor: 'rgba(59, 130, 246, 1)',
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: 'rgba(59, 130, 246, 1)'
+                    }]
+                },
+                options: {
+                    maintainAspectRatio: false,
+                    scales: {
+                        r: {
+                            angleLines: {
+                                color: '#d6d3d1' // stone-300
+                            },
+                            grid: {
+                                color: '#e7e5e4' // stone-200
+                            },
+                            pointLabels: {
+                                font: {
+                                    size: 14,
+                                },
+                                color: '#57534e' // stone-600
+                            },
+                            ticks: {
+                                backdropColor: 'rgba(245, 245, 244, 0.75)',
+                                color: '#78716c', // stone-500
+                                stepSize: 20
+                            },
+                            suggestedMin: 0,
+                            suggestedMax: 100
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.dataset.label + ': ' + context.raw + '%';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
